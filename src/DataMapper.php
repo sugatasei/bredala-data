@@ -139,5 +139,55 @@ class DataMapper
         return $output;
     }
 
+    /**
+     * Returns difference between two arrays
+     *
+     * @param array $new
+     * @param array $old
+     */
+    public static function diff(array $new, array $old): array
+    {
+        $out = [];
+
+        foreach ($new as $key => $value) {
+            if (array_key_exists($key, $old)) {
+                if ($value != $old[$key]) {
+                    $out[$key] = $value;
+                }
+            } else {
+                $out[$key] = $value;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Returns recursive difference between two arrays
+     *
+     * @param array $new
+     * @param array $old
+     */
+    public static function diffRecursive(array $new, array $old): array
+    {
+        $out = [];
+
+        foreach ($new as $key => $value) {
+            if (array_key_exists($key, $old)) {
+                if (is_array($value)) {
+                    if (($diff = self::diffRecursive($value, $old[$key]))) {
+                        $out[$key] = $diff;
+                    }
+                } else {
+                    if ($value != $old[$key]) {
+                        $out[$key] = $value;
+                    }
+                }
+            } else {
+                $out[$key] = $value;
+            }
+        }
+        return $out;
+    }
+
     // -------------------------------------------------------------------------
 }
