@@ -4,6 +4,7 @@ namespace Bredala\Data;
 
 use Bredala\Data\Encoders\DataEncoder;
 use Bredala\Data\Encoders\DataListEncoder;
+use Bredala\Data\Encoders\EncoderInterface;
 use JsonSerializable;
 
 class Data implements JsonSerializable
@@ -42,16 +43,18 @@ class Data implements JsonSerializable
      */
     public function import(array $data = []): static
     {
-        if (!($mapper = Cache::get(static::class . '::mapper'))) {
+        if (!($mapper = self::get('map'))) {
             $mapper = new DataMapper();
-            foreach ($this->mapping() as $property => $classname) {
-                if (is_array($classname)) {
-                    $mapper->map($property, new DataListEncoder($classname[0]));
+            foreach ($this->mapping() as $property => $encoder) {
+                if ($encoder instanceof EncoderInterface) {
+                    $mapper->map($property, $encoder);
+                } elseif (is_array($encoder)) {
+                    $mapper->map($property, new DataListEncoder($encoder[0]));
                 } else {
-                    $mapper->map($property, new DataEncoder($classname));
+                    $mapper->map($property, new DataEncoder($encoder));
                 }
             }
-            Cache::set(static::class . '::mapper', $mapper);
+            self::set('map', $mapper);
         }
 
         foreach ($mapper->encode($data) as $property => $value) {
@@ -88,7 +91,7 @@ class Data implements JsonSerializable
 
     final public function properties(): array
     {
-        if (null === ($poperties = Cache::get(static::class . '::properties'))) {
+        if (null === ($poperties = self::get('properties'))) {
             $reflect = new \ReflectionClass($this);
             $props = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
 
@@ -99,9 +102,52 @@ class Data implements JsonSerializable
                 }
             }
 
-            Cache::set(static::class . '::properties', $poperties);
+            self::set('properties', $poperties);
         }
 
         return $poperties;
+    }
+
+    /**
+     * Gets data from cache
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public static function get(string $name)
+    {
+        return Cache::get(self::cacheKey($name));
+    }
+
+    /**
+     * Caches a data
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public static function set(string $name, $value)
+    {
+        Cache::set(self::cacheKey($name), $value);
+    }
+
+    /**
+     * Deletes a cache entry
+     *
+     * @param string $name
+     */
+    public static function del(string $name)
+    {
+        Cache::del(self::cacheKey($name));
+    }
+
+    /**
+     * Builds the cache key
+     *
+     * @param string $name
+     * @return string
+     */
+    private static function cacheKey(string $name): string
+    {
+        return static::class . '::' . $name;
     }
 }

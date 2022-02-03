@@ -9,6 +9,9 @@ class Cache
     public static function set(string $name, $value)
     {
         self::$data[$name] = $value;
+        if ($value === null) {
+            unset(self::$data[$name]);
+        }
     }
 
     public static function get(string $name)
