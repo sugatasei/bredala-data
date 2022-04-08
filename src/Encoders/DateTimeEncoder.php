@@ -2,7 +2,9 @@
 
 namespace Bredala\Data\Encoders;
 
-class TimestampEncoder implements EncoderInterface
+use DateTime;
+
+class DateTimeEncoder implements EncoderInterface
 {
     private string $format;
 
@@ -12,7 +14,7 @@ class TimestampEncoder implements EncoderInterface
     }
 
     /**
-     * @param int|null $value
+     * @param DateTime|null $value
      * @return string|null
      */
     public function encode($value)
@@ -20,18 +22,18 @@ class TimestampEncoder implements EncoderInterface
         if ($value === null) {
             return $value;
         }
-        return date($this->format, (int) $value);
+        return $value->format($this->format);
     }
 
     /**
      * @param string|null $value
-     * @return int|null
+     * @return DateTime|null
      */
     public function decode($value)
     {
         if ($value === null) {
             return $value;
         }
-        return strtotime($value);
+        return new DateTime($value);
     }
 }
