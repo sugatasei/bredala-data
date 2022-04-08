@@ -2,70 +2,9 @@
 
 namespace Bredala\Data;
 
-use Bredala\Data\Encoders\EncoderInterface;
-
-class DataMapper
+class ArrayHelper
 {
-    /**
-     * @var EncoderInterface[]
-     */
-    private $encoders = [];
-
-    /**
-     * @return $this
-     */
-    public static function create()
-    {
-        return new static();
-    }
-
-    /**
-     * @param string $key
-     * @param EncoderInterface $encoder
-     * @return $this
-     */
-    public function map(string $key, EncoderInterface $encoder)
-    {
-        $this->encoders[$key] = $encoder;
-
-        return $this;
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     */
-    public function encode(array $data): array
-    {
-        foreach ($data as $key => $value) {
-            if ($value !== null && isset($this->encoders[$key])) {
-                $data[$key] = $this->encoders[$key]->encode($value);
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     */
-    public function decode(array $data): array
-    {
-        foreach ($data as $key => $value) {
-            if ($value !== null && isset($this->encoders[$key])) {
-                $data[$key] = $this->encoders[$key]->decode($value);
-            }
-        }
-
-        return $data;
-    }
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    public static function extract(array $data, array $keys)
+    public static function extract(array $data, array $keys): array
     {
         $out = [];
         foreach ($keys as $key) {
@@ -82,7 +21,7 @@ class DataMapper
      * @param array $replace : ['oldName' => 'newName']
      * @return array
      */
-    public static function renameKey(array $input, array $replace): array
+    public static function renameKeys(array $input, array $replace): array
     {
         $output = [];
 

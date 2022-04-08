@@ -6,9 +6,14 @@ namespace Bredala\Data;
  * Micro caching tools
  * Store data during script execution only
  */
-class Cache
+class MicroCache
 {
     private static array $data = [];
+
+    public static function has(string $key): bool
+    {
+        return array_key_exists($key, self::$data);
+    }
 
     /**
      * Gets data from key
@@ -30,9 +35,6 @@ class Cache
     public static function set(string $key, mixed $value): void
     {
         self::$data[$key] = $value;
-        if ($value === null) {
-            unset(self::$data[$key]);
-        }
     }
 
     /**
@@ -42,6 +44,7 @@ class Cache
      */
     public static function del(string $key): void
     {
-        self::set($key, null);
+        self::$data[$key] = null;
+        unset(self::$data[$key]);
     }
 }

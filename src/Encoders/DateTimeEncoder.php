@@ -2,10 +2,19 @@
 
 namespace Bredala\Data\Encoders;
 
-class JsonEncoder implements EncoderInterface
+use DateTime;
+
+class DateTimeEncoder implements EncoderInterface
 {
+    private string $format;
+
+    public function __construct(string $format = 'Y-m-d H:i:s')
+    {
+        $this->format = $format;
+    }
+
     /**
-     * @param mixed $value
+     * @param DateTime|null $value
      * @return string|null
      */
     public function encode($value)
@@ -14,12 +23,12 @@ class JsonEncoder implements EncoderInterface
             return null;
         }
 
-        return json_encode($value);
+        return $value->format($this->format);
     }
 
     /**
      * @param string|null $value
-     * @return mixed
+     * @return DateTime|null
      */
     public function decode($value)
     {
@@ -27,6 +36,6 @@ class JsonEncoder implements EncoderInterface
             return null;
         }
 
-        return json_decode($value, true);
+        return new DateTime($value);
     }
 }

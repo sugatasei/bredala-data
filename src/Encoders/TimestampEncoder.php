@@ -11,13 +11,29 @@ class TimestampEncoder implements EncoderInterface
         $this->format = $format;
     }
 
+    /**
+     * @param int|null $value
+     * @return string|null
+     */
     public function encode($value)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return date($this->format, (int) $value);
     }
 
+    /**
+     * @param string|null $value
+     * @return int|null
+     */
     public function decode($value)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return strtotime($value);
     }
 }
