@@ -20,9 +20,8 @@ class DateTimeEncoder implements EncoderInterface
     public function encode($value)
     {
         if ($value === null) {
-            return null;
+            return $value;
         }
-
         return $value->format($this->format);
     }
 
@@ -33,9 +32,8 @@ class DateTimeEncoder implements EncoderInterface
     public function decode($value)
     {
         if ($value === null) {
-            return null;
+            return $value;
         }
-
         return new DateTime($value);
     }
 }
