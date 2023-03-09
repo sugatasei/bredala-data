@@ -6,7 +6,7 @@ namespace Bredala\Data;
  * Micro caching tools
  * Store data during script execution only
  */
-class MicroCache
+final class MicroCache
 {
     private static array $data = [];
 
