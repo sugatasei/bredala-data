@@ -1,6 +1,6 @@
 <?php
 
-namespace Bredala\Data\Reflection;
+namespace Bredala\Data;
 
 use ReflectionClass;
 
@@ -37,14 +37,16 @@ final class Reflection
     }
 
     /**
-     * @return Property[]
+     * @return array
      */
     public function properties(): array
     {
         if ($this->properties === null) {
             $this->properties = [];
-            foreach ($this->reflectionClass()->getProperties() as $property) {
-                $this->properties[$property->getName()] = new Property($property);
+            foreach ($this->reflectionClass()->getProperties() as $item) {
+                if ($item->isPublic() && !$item->isStatic()) {
+                    $this->properties[] = $item->getName();
+                }
             }
         }
 
@@ -52,18 +54,38 @@ final class Reflection
     }
 
     /**
-     * @return Method[]
+     * @param string $key
+     * @return boolean
+     */
+    public function hasProperty(string $key): bool
+    {
+        return in_array($key, $this->properties());
+    }
+
+    /**
+     * @return array
      */
     public function methods(): array
     {
         if ($this->methods === null) {
             $this->methods = [];
-            foreach ($this->reflectionClass()->getMethods() as $method) {
-                $this->methods[$method->getName()] = new Method($method);
+            foreach ($this->reflectionClass()->getMethods() as $item) {
+                if ($item->isPublic() && !$item->isStatic()) {
+                    $this->methods[] = $item->getName();
+                }
             }
         }
 
         return $this->methods;
+    }
+
+    /**
+     * @param string $key
+     * @return boolean
+     */
+    public function hasMethod(string $key): bool
+    {
+        return in_array($key, $this->methods());
     }
 
     /**
